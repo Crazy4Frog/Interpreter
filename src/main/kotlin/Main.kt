@@ -1,10 +1,20 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+import java.io.File
 
-    tokenTypeMap.values.forEach { x -> x.regex.pattern = "^" + x.regex.pattern }
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
+fun main(args : Array<String>) {
+    val code = File("./src/main/kotlin/code.txt").readText(charset = Charsets.UTF_8)
+    val lexer = Lexer(code)
+    val tokens = lexer.lexicalAnalysis()
+
+    tokens.forEach { x -> println(x.aboutMe()) }
+
+    val parser = Parser(tokens, DEBUG = true)
+    parser.run()
+//    val parser = Parser(tokens, true)
+//    val rootNode = parser.parseCode()
+//    println("\n ${((rootNode as StatementsNode).codeStrings[0] as BinaryOperatorNode).rightNode}")
+//    parser.run(rootNode)
 }
-fun sum(a:Int, b:Int):Int{
-    return a + b
-}
+
+//    val regex = Regex("^" + tokenTypeMap["NUMBER"]?.regex?.pattern)
+// Try adding program arguments via Run/Debug configuration.
+// Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.

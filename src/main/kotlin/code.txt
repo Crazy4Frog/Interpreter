@@ -1,0 +1,25 @@
+var arr: Int = 100 / 30 ;
+arr = 100;
+print(arr + 10 * 1000);
+
+!!! print (20)
+
+
+!!! HELLO{}!@#@$%#@%{DS[]FS() !!!
+
+fun foo() {
+
+var arr[10]: String
+print (15);
+return 20;
+}
+
+
+
+fun main() {
+    var x: Int = foo();
+    print x
+    return 0;
+}
+EOF!!!
+
