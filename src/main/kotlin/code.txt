@@ -1,6 +1,5 @@
-var arr: Int = 100 / 30 ;
-arr = 100;
-print(arr + 10 * 1000);
+var arr: Int = 100 / 30 > 1 ;
+print(arr + 10);
 
 !!! print (20)
 
