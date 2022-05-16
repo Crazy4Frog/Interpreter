@@ -40,7 +40,6 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     fun run() {
-        println("HERE")
         while (pos < tokens.size) {
             parsing()
         }
@@ -81,20 +80,19 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     private fun parsePrint() {
-
         val expression = parseExpression()
         if (expression == null) {
             if (DEBUG) {
                 println("Empty output")
             }
-            println()
+            println("")
         } else {
-            print("Result = $expression")
+            println("$expression")
         }
     }
 
     private fun parseAssignment() {
-        var variableName : String = tokens[pos].text
+        var variableName : String = tokens[pos - 1].text
         var arrIndex : Int? = null
         if (match("[") != null) {
             arrIndex = parseExpression() as Int;
@@ -115,7 +113,7 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
         var currentToken = require("number", "identifier", "(")
         var isBooleanOperation : Boolean = false
         while (currentToken.text != ";" && currentToken.text != "{") {
-//            println(currentToken.aboutMe())
+            println(currentToken.aboutMe())
             if (currentToken.text == "(") {
                 operatorsStack.push("(")
             } else if (currentToken.text == ")") {
@@ -143,6 +141,7 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
             } else if (currentToken.type.name == "IDENT_NAME") {
                 numberStack.push(scope[currentToken.text] as Int)
             }
+
             currentToken = require("number", "identifier", "[", "]", "(", ")", ";", *OPERATORS, "{")
         }
         while (!operatorsStack.isEmpty()) {
@@ -193,19 +192,29 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     private fun parseIf() {
         var isTrue : Boolean = parseExpression() as Int != 0
         if (isTrue) {
-            while (match("}") == null) {
-                parsing()
+            var openBraces = 1
+            var closingBraces = 0
+            while (openBraces != closingBraces) {
+                if (match("}") != null) closingBraces++
+                else if (match("{") != null) openBraces++
+                else parsing()
             }
         } else {
             var openBraces = 1
             var closingBraces = 0
             while (openBraces != closingBraces) {
                 if (match("}") != null) closingBraces++
-                if (match("{") != null) openBraces++
+                else if (match("{") != null) openBraces++
+                else pos++
             }
             if (match("else") != null) {
-                while (match("}") == null) {
-                    parsing()
+                require("{")
+                var openBraces = 1
+                var closingBraces = 0
+                while (openBraces != closingBraces) {
+                    if (match("}") != null) closingBraces++
+                    else if (match("{") != null) openBraces++
+                    else parsing()
                 }
             }
         }
