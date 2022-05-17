@@ -1,7 +1,18 @@
-var arr: Int = 100 / 30 > 1 ;
-arr = (20*(9+4)+6);
+var a1: Int = 100 / 30 > 1 ;
+a1 = (20*(9+4)+6);
+if (a1 > 0) {
+    print(11);
+    if(a1 > 381) {
+        print(11);
+    } else {
+        print(10);
+    }
 
-print(arr);
+    if (1) {
+        print(21);
+    }
+}
+print(a1);
 
 
 !!! HELLO{}!@#@$%#@%{DS[]FS() !!!
@@ -21,4 +32,3 @@ fun main() {
     return 0;
 }
 EOF!!!
-

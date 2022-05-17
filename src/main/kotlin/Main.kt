@@ -4,10 +4,11 @@ fun main(args : Array<String>) {
     val code = File("./src/main/kotlin/code.txt").readText(charset = Charsets.UTF_8)
     val lexer = Lexer(code, DEBUG = false)
     val tokens = lexer.lexicalAnalysis()
-//    tokens.forEach { x -> println(x.aboutMe()) }
+    tokens.forEach { x -> println(x.aboutMe()) }
 
-    val parser = Parser(tokens, DEBUG = true)
-    parser.run()
+//    val parser = Parser(tokens, DEBUG = true)
+//    parser.run()
+    println("End of the program...")
 //    val parser = Parser(tokens, true)
 //    val rootNode = parser.parseCode()
 //    println("\n ${((rootNode as StatementsNode).codeStrings[0] as BinaryOperatorNode).rightNode}")

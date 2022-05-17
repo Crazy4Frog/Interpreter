@@ -52,13 +52,13 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
             println("STARTED PRINT PARSING"); parsePrint()
         } else if (match("identifier") != null) {
             println("STARTED ASSIGMENT PARSING"); parseAssignment()
-//        } else if (match("if") != null) {
-//            println("STARTED PARSING CONDITIONAL"); parseIf()
+        } else if (match("if") != null) {
+            println("STARTED PARSING CONDITIONAL"); parseIf()
 //        } else if (match("while") != null) {
 //            println("STARTED LOOP PARSING"); parseLoop()
 //        } else if (match("fun") != null) parseFunDeclaration() {
 
-        }
+        } else pos++;
 
     }
 
@@ -139,6 +139,9 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
             } else if (currentToken.type.name == "NUMBER") {
                 numberStack.push(currentToken.text.toInt())
             } else if (currentToken.type.name == "IDENT_NAME") {
+                if (scope[currentToken.text] == null) {
+                    throw Error("Check ${currentToken.position}. Variable isn't declared")
+                }
                 numberStack.push(scope[currentToken.text] as Int)
             }
 
@@ -152,52 +155,72 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     private fun calculateExpression(number1 : Int, number2 : Int, operator : String) : Int {
-        if (operator == "+") {
-            return number2 + number1
+        when (operator) {
+            "+" -> {
+                return number2 + number1
+            }
+            "-" -> {
+                return number2 - number1
+            }
+            "*" -> {
+                return number2 * number1
+            }
+            "/" -> {
+                return number2 / number1
+            }
+            "!=" -> {
+                return if (number2 != number1) 1 else 0
+            }
+            "==" -> {
+                return if (number2 == number1) 1 else 0
+            }
+            ">=" -> {
+                return if (number2 >= number1) 1 else 0
+            }
+            "<=" -> {
+                return if (number2 <= number1) 1 else 0
+            }
+            ">" -> {
+                return if (number2 > number1) 1 else 0
+            }
+            "<" -> {
+                return if (number2 < number1) 1 else 0
+            }
+            "||" -> {
+                return if ((number1 != 0) || (number2 != 0)) 1 else 0
+            }
+            "&&" -> {
+                return if ((number1 != 0) && (number2 != 0)) 1 else 0
+            }
+            else -> throw Error("Operator '$operator' isn't supported")
         }
-        if (operator == "-") {
-            return number2 - number1
-        }
-        if (operator == "*") {
-            return number2 * number1
-        }
-        if (operator == "/") {
-            return number2 / number1
-        }
-        if (operator == "!=") {
-            return if (number2 != number1) 1 else 0
-        }
-        if (operator == "==") {
-            return if (number2 == number1) 1 else 0
-        }
-        if (operator == ">=") {
-            return if (number2 >= number1) 1 else 0
-        }
-        if (operator == "<=") {
-            return if (number2 <= number1) 1 else 0
-        }
-        if (operator == ">") {
-            return if (number2 > number1) 1 else 0
-        }
-        if (operator == "<") {
-            return if (number2 < number1) 1 else 0
-        }
-        throw Error("Operator '$operator' isn't supported")
     }
 
     private fun parseLoop() {
+        var startConditionPos = pos
+        var isTrue : Boolean = parseExpression() as Int != 0
+        while(isTrue){
+            parsing()
+            pos = startConditionPos
+            isTrue = parseExpression() as Int != 0
+        }
 
     }
 
     private fun parseIf() {
         var isTrue : Boolean = parseExpression() as Int != 0
         if (isTrue) {
-            var openBraces = 1
-            var closingBraces = 0
-            while (openBraces != closingBraces) {
-                if (match("}") != null) closingBraces++
-                else if (match("{") != null) openBraces++
-                else parsing()
+            while (tokens[pos].text != "}") {
+                parsing()
+            }
+            if (match("else") != null) {
+                var openBraces = 1
+                var closingBraces = 0
+                while (openBraces != closingBraces) {
+                    if (match("}") != null) closingBraces++
+                    else if (match("{") != null) openBraces++
+                    else pos++
+                }
             }
         } else {
             var openBraces = 1
@@ -209,14 +232,38 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
             }
             if (match("else") != null) {
                 require("{")
-                var openBraces = 1
-                var closingBraces = 0
-                while (openBraces != closingBraces) {
-                    if (match("}") != null) closingBraces++
-                    else if (match("{") != null) openBraces++
-                    else parsing()
+                while (tokens[pos].text != "}") {
+                    parsing()
                 }
             }
         }
+
+//        if (isTrue) {
+//            var openBraces = 1
+//            var closingBraces = 0
+//            while (openBraces != closingBraces) {
+//                if (match("}") != null) closingBraces++
+//                else if (match("{") != null) openBraces++
+//                else parsing()
+//            }
+//        } else {
+//            var openBraces = 1
+//            var closingBraces = 0
+//            while (openBraces != closingBraces) {
+//                if (match("}") != null) closingBraces++
+//                else if (match("{") != null) openBraces++
+//                else pos++
+//            }
+//            if (match("else") != null) {
+//                require("{")
+//                var openBraces = 1
+//                var closingBraces = 0
+//                while (openBraces != closingBraces) {
+//                    if (match("}") != null) closingBraces++
+//                    else if (match("{") != null) openBraces++
+//                    else parsing()
+//                }
+//            }
+//        }
     }
 }
