@@ -5,7 +5,7 @@ public class Lexer(val code : String, private val DEBUG : Boolean = false) {
     private var tokenListAll = mutableListOf<Token>()
 
     private fun filterTokenList(tokenList : MutableList<Token>) : List<Token> {
-        return tokenList.filter { token -> token.type.name !in listOf(tokensMap["SPACE"]!!.name, tokensMap["comment"]!!.name) }
+        return tokenList.filter { token -> token.type.name !in listOf("SPACE", "COMMENT", "NEWSTR") }
     }
 
     fun lexicalAnalysis() : List<Token> {
