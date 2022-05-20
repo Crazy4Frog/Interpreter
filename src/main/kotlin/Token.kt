@@ -20,6 +20,7 @@ val tokensMap : Map<String, TokenType>
             "return" to TokenType("RETURN", "ReservedWords", Regex("return")),
             "String" to TokenType("TypeString", "ReservedWords", Regex("String")),
             "Int" to TokenType("TypeInt", "ReservedWords", Regex("Int")),
+            "Array" to TokenType("TypeArray", "ReservedWords", Regex("Array")),
             "var" to TokenType("VAR", "ReservedWords", Regex("var")),
             "fun" to TokenType("FUN", "ReservedWords", Regex("fun")),
             "stringValue" to TokenType("STRING", "Types", Regex("\"[\\w\\s]*\"")),

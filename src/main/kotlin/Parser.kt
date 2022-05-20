@@ -58,10 +58,15 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
     private fun parseVarInitializing() {
         val variableName = require("identifier").text
         require(":")
-        require("Int")
-        require("=")
-        val variableValue = parseExpression()!!
-        scope[variableName] = variableValue
+        val varType = require("Int", "Array").text
+        if (varType == "Int") {
+            require("=")
+            val variableValue = parseExpression()!!
+            scope[variableName] = variableValue
+        } else {
+            val size = parseExpression() as Int
+            scope[variableName] = Array<Int>(size) { 0 }
+        }
     }
 
     private fun parsePrint() {
@@ -78,10 +83,20 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
 
     private fun parseAssignment() {
         val variableName : String = tokens[pos - 1].text
+        var index = -1
+        if (match("[") != null) {
+            index = parseExpression() as Int
+        }
         require("=")
-        val variableValue = parseExpression()
+        val variableValue = parseExpression() as Int
         if (scope[variableName] != null) {
-            scope[variableName] = variableValue as Int
+            if (scope[variableName] is Array<*>) {
+                if (index != -1) {
+                    (scope[variableName] as Array<Int>)[index] = variableValue
+                }
+            } else {
+                scope[variableName] = variableValue
+            }
         } else throw Exception("Variable $variableName is not declared!")
     }
 
@@ -92,7 +107,7 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
         val operatorsStack = ArrayDeque<String>()
         val numberStack = ArrayDeque<Int>()
         var currentToken = require("number", "identifier", "(")
-        while (currentToken.text != ";" && currentToken.text != "{") {
+        while (currentToken.text !in listOf(";", "{", "]")) {
 //            if (DEBUG) println(currentToken.aboutMe())
             if (currentToken.text == "(") {
                 operatorsStack.push("(")
@@ -120,9 +135,14 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
                 numberStack.push(currentToken.text.toInt())
             } else if (currentToken.type.name == "IDENT_NAME") {
                 if (scope[currentToken.text] == null) {
-                    throw Error("Check ${currentToken.position}. Variable isn't declared")
+                    throw Exception("Check ${currentToken.stringNumber} string, ${currentToken.stringPos} pos. Variable isn't declared")
                 }
-                numberStack.push(scope[currentToken.text] as Int)
+                if (match("[") != null) {
+                    var index = parseExpression() as Int
+                    numberStack.push((scope[currentToken.text] as Array<Int>)[index])
+                } else {
+                    numberStack.push(scope[currentToken.text] as Int)
+                }
             }
             currentToken = require("number", "identifier", "[", "]", "(", ")", ";", *OPERATORS, "{")
         }
