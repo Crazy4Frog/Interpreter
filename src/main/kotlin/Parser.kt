@@ -26,7 +26,7 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
 
     private fun require(vararg expected : String) : Token {
         // return Token if currentToken is one of expected else throw exception
-        return match(*expected) ?: throw Error("Check pos ${tokens[pos].position}. Expected ${tokensMap[expected[0]]?.name}")
+        return match(*expected) ?: throw Exception("Check string ${tokens[pos].stringNumber}, position ${tokens[pos].stringPos}. Expected ${tokensMap[expected[0]]?.name} but found ${tokens[pos].text}")
     }
 
     fun run() {
@@ -93,7 +93,7 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
         val numberStack = ArrayDeque<Int>()
         var currentToken = require("number", "identifier", "(")
         while (currentToken.text != ";" && currentToken.text != "{") {
-            if (DEBUG) println(currentToken.aboutMe())
+//            if (DEBUG) println(currentToken.aboutMe())
             if (currentToken.text == "(") {
                 operatorsStack.push("(")
             } else if (currentToken.text == ")") {
@@ -195,7 +195,7 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
         var isTrue : Boolean = parseExpression() as Int != 0
         if (DEBUG) println("Loop condition = $isTrue")
         while (isTrue) {
-            while (tokens[pos].text != "}") {
+            while (match("}") == null) {
                 parsing()
             }
             pos = startConditionPos
@@ -211,10 +211,9 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
         val isTrue : Boolean = parseExpression() as Int != 0
         if (DEBUG) println("`If` condition = $isTrue")
         if (isTrue) {
-            while (tokens[pos].text != "}") {
+            while (match("}") == null) {
                 parsing()
             }
-            require("}")
             if (match("else") != null) {
                 require("{")
                 skipBlock()
@@ -222,8 +221,7 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
         } else {
             skipBlock()
             if (match("else") != null) {
-                require("{")
-                while (tokens[pos].text != "}") {
+                while (match("}") == null) {
                     parsing()
                 }
             }
