@@ -11,6 +11,7 @@ public val tokensMap : Map<String, TokenType>
     get() = mapOf(
             "SPACE" to TokenType("SPACE", "spaces", Regex("[ \\t\\r]")),
             "\\n" to TokenType("NEWSTR", "spaces", Regex("\\n")),
+            "input" to TokenType("INPUT", "ReservedWords", Regex("input")),
             "print" to TokenType("PRINT", "ReservedWords", Regex("print")),
             "if" to TokenType("IF", "ReservedWords", Regex("if")),
             "else" to TokenType("ELSE", "ReservedWords", Regex("else")),

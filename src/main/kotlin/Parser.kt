@@ -13,7 +13,8 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     private fun match(vararg expected : String) : Token? {
         // return Token if currentToken is one of expected else null
         if (pos >= tokens.size) {
-            println("Match returned null" + "\n vararg was: ${expected[0]}"); throw Error("pos >= tokens.size")
+            return null
+//            println("Match returned null" + "\n vararg was: ${expected[0]}"); throw Error("pos >= tokens.size")
         }
 
         val currentToken = tokens[pos]
@@ -47,15 +48,20 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
 
     private fun parsing() {
         if (match("var") != null) {
-            println("STARTED VAR INITIALIZING PARSING"); parseVarInitializing()
+            if (DEBUG) println("STARTED VAR INITIALIZING PARSING")
+            parseVarInitializing()
         } else if (match("print") != null) {
-            println("STARTED PRINT PARSING"); parsePrint()
+            if (DEBUG) println("STARTED PRINT PARSING")
+            parsePrint()
         } else if (match("identifier") != null) {
-            println("STARTED ASSIGMENT PARSING"); parseAssignment()
+            if (DEBUG) println("STARTED ASSIGMENT PARSING")
+            parseAssignment()
         } else if (match("if") != null) {
-            println("STARTED PARSING CONDITIONAL"); parseIf()
-//        } else if (match("while") != null) {
-//            println("STARTED LOOP PARSING"); parseLoop()
+            if (DEBUG) println("STARTED PARSING CONDITIONAL")
+            parseIf()
+        } else if (match("while") != null) {
+            if (DEBUG) println("STARTED LOOP PARSING")
+            parseLoop()
 //        } else if (match("fun") != null) parseFunDeclaration() {
 
         } else pos++;
@@ -108,12 +114,15 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     private fun parseExpression() : Any? {
+        if (match("input") != null) {
+            return readLine()?.toInt()
+        }
         val operatorsStack = ArrayDeque<String>()
         val numberStack = ArrayDeque<Int>()
         var currentToken = require("number", "identifier", "(")
         var isBooleanOperation : Boolean = false
         while (currentToken.text != ";" && currentToken.text != "{") {
-            println(currentToken.aboutMe())
+            if (DEBUG) println(currentToken.aboutMe())
             if (currentToken.text == "(") {
                 operatorsStack.push("(")
             } else if (currentToken.text == ")") {
@@ -124,10 +133,10 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
                     currentOperator = operatorsStack.pop()
                 }
             } else if (currentToken.type.group == "operators" || currentToken.type.group == "BooleanOperators") {
-                if (operatorsStack.isEmpty() || operatorsStack.last == "(") operatorsStack.push(currentToken.text)
+                if (operatorsStack.isEmpty() || operatorsStack.first == "(") operatorsStack.push(currentToken.text)
                 else {
                     val currentOperatorPriority = OPERATORS_PRIORITY[currentToken.text]!!
-                    val stackOperatorPriority = OPERATORS_PRIORITY[operatorsStack.last]!!
+                    val stackOperatorPriority = OPERATORS_PRIORITY[operatorsStack.first]!!
                     if (currentOperatorPriority > stackOperatorPriority) {
                         operatorsStack.push(currentToken.text)
                     } else {
@@ -196,40 +205,46 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
         }
     }
 
+    private fun skipBlock() {
+        var openBraces = 1
+        var closingBraces = 0
+        while (openBraces != closingBraces) {
+            if (match("}") != null) closingBraces++
+            else if (match("{") != null) openBraces++
+            else pos++
+        }
+    }
+
     private fun parseLoop() {
         var startConditionPos = pos
         var isTrue : Boolean = parseExpression() as Int != 0
-        while(isTrue){
-            parsing()
+        if (DEBUG) println("Loop condition = $isTrue")
+        while (isTrue) {
+            while (tokens[pos].text != "}") {
+                parsing()
+            }
             pos = startConditionPos
             isTrue = parseExpression() as Int != 0
+            if (DEBUG) println("Loop condition = $isTrue")
         }
+        skipBlock()
 
     }
 
     private fun parseIf() {
         var isTrue : Boolean = parseExpression() as Int != 0
+        if (DEBUG) println("Condition = $isTrue")
         if (isTrue) {
             while (tokens[pos].text != "}") {
                 parsing()
             }
+            require("}")
             if (match("else") != null) {
-                var openBraces = 1
-                var closingBraces = 0
-                while (openBraces != closingBraces) {
-                    if (match("}") != null) closingBraces++
-                    else if (match("{") != null) openBraces++
-                    else pos++
-                }
+                require("{")
+                skipBlock()
             }
         } else {
-            var openBraces = 1
-            var closingBraces = 0
-            while (openBraces != closingBraces) {
-                if (match("}") != null) closingBraces++
-                else if (match("{") != null) openBraces++
-                else pos++
-            }
+            skipBlock()
             if (match("else") != null) {
                 require("{")
                 while (tokens[pos].text != "}") {
@@ -237,33 +252,5 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
                 }
             }
         }
-
-//        if (isTrue) {
-//            var openBraces = 1
-//            var closingBraces = 0
-//            while (openBraces != closingBraces) {
-//                if (match("}") != null) closingBraces++
-//                else if (match("{") != null) openBraces++
-//                else parsing()
-//            }
-//        } else {
-//            var openBraces = 1
-//            var closingBraces = 0
-//            while (openBraces != closingBraces) {
-//                if (match("}") != null) closingBraces++
-//                else if (match("{") != null) openBraces++
-//                else pos++
-//            }
-//            if (match("else") != null) {
-//                require("{")
-//                var openBraces = 1
-//                var closingBraces = 0
-//                while (openBraces != closingBraces) {
-//                    if (match("}") != null) closingBraces++
-//                    else if (match("{") != null) openBraces++
-//                    else parsing()
-//                }
-//            }
-//        }
     }
 }

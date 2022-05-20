@@ -1,10 +1,24 @@
-var a : Int = 156;
-if(a>50)
-{
+var a : Int = input();
+a = a * (20*(9+4)+6);
 print(a);
+if(a>10) {
+    while(a < 1000){
+        a = a + 1;
+        print(a);
+    }
+} else {
+    if(a > 5) {
+        print(a + 10);
+        if (a < 9) {
+            print(7);
+        }
+    } else {
+        print(a - 10);
+    }
 }
+
+
 !!!var a1: Int = 100 / 30 > 1 ;
-a1 = (20*(9+4)+6);
 if (a1 > 0) {
     print(11);
     if(a1 > 381) {
