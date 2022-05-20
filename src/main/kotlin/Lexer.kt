@@ -1,7 +1,7 @@
-public class Lexer(val code : String, private val DEBUG : Boolean = false) {
+class Lexer(private val code : String, private val DEBUG : Boolean = false) {
     private var pos : Int = 0
-    private var stringNumber = 0;
-    private var stringPos = 0;
+    private var stringNumber = 0
+    private var stringPos = 0
     private var tokenListAll = mutableListOf<Token>()
 
     private fun filterTokenList(tokenList : MutableList<Token>) : List<Token> {

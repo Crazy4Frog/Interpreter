@@ -1,6 +1,6 @@
 import java.io.File
 
-fun main(args : Array<String>) {
+fun main() {
     val code = File("./src/main/kotlin/code.txt").readText(charset = Charsets.UTF_8)
     val lexer = Lexer(code, DEBUG = false)
     val tokens = lexer.lexicalAnalysis()

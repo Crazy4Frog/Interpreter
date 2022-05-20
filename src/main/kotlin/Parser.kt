@@ -1,36 +1,26 @@
 import java.util.ArrayDeque
 
 val OPERATORS = arrayOf("+", "-", "*", "/", "==", "!=", ">=", ">", "<=", "<", "||", "&&")
-val OPERATORS_PRIORITY = mapOf<String, Int>(
+val OPERATORS_PRIORITY = mapOf(
         "||" to 1, "&&" to 1, "==" to 2, "!=" to 2, ">=" to 2, ">" to 2, "<=" to 2, "<" to 2, "+" to 3, "-" to 3, "*" to 4, "/" to 4,
 )
 
-public class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = false) {
-    private var pos : Int = 0;
+class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = false) {
+    private var pos : Int = 0
     private val scope = mutableMapOf<String, Any>()
 
-    //    private val scopeArrays = mutableMapOf<String, List<>>()
     private fun match(vararg expected : String) : Token? {
         // return Token if currentToken is one of expected else null
         if (pos >= tokens.size) {
             return null
-//            println("Match returned null" + "\n vararg was: ${expected[0]}"); throw Error("pos >= tokens.size")
         }
 
         val currentToken = tokens[pos]
         if (expected.find { type -> tokensMap[type]!!.name == currentToken.type.name } != null) {
             pos++
 
-//            if (DEBUG) {
-//                println("Match returned ${currentToken.aboutMe()}")
-//            }
-
             return currentToken
         }
-
-//        if (DEBUG) {
-//            println("Match returned null" + "\n vararg was: ${expected[0]}" + " found ${tokens[pos].aboutMe()}")
-//        }
 
         return null
     }
@@ -62,25 +52,23 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
         } else if (match("while") != null) {
             if (DEBUG) println("STARTED LOOP PARSING")
             parseLoop()
-//        } else if (match("fun") != null) parseFunDeclaration() {
-
-        } else pos++;
+        } else pos++
 
     }
 
     private fun parseVarInitializing() {
-        var variableName = require("identifier").text
+        val variableName = require("identifier").text
         var isArray = false
-        var arrSize : Int = 0;
+        var arrSize = 0
         if (match("[") != null) {
             isArray = true
             arrSize = (parseExpression() as Int)
             require("]")
         }
         require(":")
-        var variableType = require("String", "Int").text
+        val  variableType = require("String", "Int").text
         require("=")
-        var variableValue = parseExpression()!!
+        val variableValue = parseExpression()!!
         scope[variableName] =
                 if (isArray && arrSize > 0) buildList { for (i in 1..arrSize) add(if (variableType == "Int") 0 else "") } else variableValue
     }
@@ -98,14 +86,14 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     private fun parseAssignment() {
-        var variableName : String = tokens[pos - 1].text
+        val variableName : String = tokens[pos - 1].text
         var arrIndex : Int? = null
         if (match("[") != null) {
-            arrIndex = parseExpression() as Int;
+            arrIndex = parseExpression() as Int
             require("]")
         }
         require("=")
-        var variableValue = parseExpression()
+        val variableValue = parseExpression()
         if (scope[variableName] != null) {
             if (arrIndex != null) {
                 (scope[variableName] as Array<Int>)[arrIndex] = (variableValue as Int)
@@ -120,7 +108,6 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
         val operatorsStack = ArrayDeque<String>()
         val numberStack = ArrayDeque<Int>()
         var currentToken = require("number", "identifier", "(")
-        var isBooleanOperation : Boolean = false
         while (currentToken.text != ";" && currentToken.text != "{") {
             if (DEBUG) println(currentToken.aboutMe())
             if (currentToken.text == "(") {
@@ -216,7 +203,7 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     private fun parseLoop() {
-        var startConditionPos = pos
+        val startConditionPos = pos
         var isTrue : Boolean = parseExpression() as Int != 0
         if (DEBUG) println("Loop condition = $isTrue")
         while (isTrue) {
@@ -232,8 +219,8 @@ public class Parser(private val tokens : List<Token>, private val DEBUG : Boolea
     }
 
     private fun parseIf() {
-        var isTrue : Boolean = parseExpression() as Int != 0
-        if (DEBUG) println("Condition = $isTrue")
+        val isTrue : Boolean = parseExpression() as Int != 0
+        if (DEBUG) println("`If` condition = $isTrue")
         if (isTrue) {
             while (tokens[pos].text != "}") {
                 parsing()

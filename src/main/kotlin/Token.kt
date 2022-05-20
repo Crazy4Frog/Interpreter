@@ -1,5 +1,5 @@
-public class TokenType(val name : String, val group : String = "default", val regex : Regex) {}
-public class Token(val type : TokenType, val text : String, val stringNumber: Int, val stringPos: Int, val position : Int) {
+class TokenType(val name : String, val group : String = "default", val regex : Regex)
+class Token(val type : TokenType, val text : String, val stringNumber: Int, val stringPos: Int, val position : Int) {
     fun aboutMe() : String {
         return "Token(${type.name}, '$text', string $stringNumber, stringPos ${stringPos}, pos: $position)"
     }
@@ -7,7 +7,7 @@ public class Token(val type : TokenType, val text : String, val stringNumber: In
 }
 
 
-public val tokensMap : Map<String, TokenType>
+val tokensMap : Map<String, TokenType>
     get() = mapOf(
             "SPACE" to TokenType("SPACE", "spaces", Regex("[ \\t\\r]")),
             "\\n" to TokenType("NEWSTR", "spaces", Regex("\\n")),
