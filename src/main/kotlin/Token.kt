@@ -1,5 +1,5 @@
 class TokenType(val name : String, val group : String = "default", val regex : Regex)
-class Token(val type : TokenType, val text : String, val stringNumber: Int, val stringPos: Int, val position : Int) {
+class Token(val type : TokenType, val text : String, val stringNumber : Int, val stringPos : Int, val position : Int) {
     fun aboutMe() : String {
         return "Token(${type.name}, '$text', string $stringNumber, stringPos ${stringPos}, pos: $position)"
     }
@@ -22,8 +22,9 @@ val tokensMap : Map<String, TokenType>
             "Int" to TokenType("TypeInt", "ReservedWords", Regex("Int")),
             "var" to TokenType("VAR", "ReservedWords", Regex("var")),
             "fun" to TokenType("FUN", "ReservedWords", Regex("fun")),
-
-            "comment" to TokenType("COMMENT", "GrammarSigns", Regex("(!!!(.|\n)*!!!)+?")),
+            "stringValue" to TokenType("STRING", "Types", Regex("\"[\\w\\s]*\"")),
+            "identifier" to TokenType("IDENT_NAME", "Identifiers", Regex("[A-Za-z_]\\w*")),
+            "comment" to TokenType("COMMENT", "GrammarSigns", Regex("!!!([^!]|!{1,2})*?!!!")),
             ";" to TokenType("SEMICOLON", "GrammarSigns", Regex(";")),
             "," to TokenType("COMMA", "GrammarSigns", Regex(",")),
             ":" to TokenType("COLON", "GrammarSigns", Regex(":")),
@@ -42,6 +43,7 @@ val tokensMap : Map<String, TokenType>
             "+" to TokenType("PLUS", "operators", Regex("\\+")),
             "-" to TokenType("MINUS", "operators", Regex("-")),
             "/" to TokenType("DIVIDE", "operators", Regex("/")),
+            "%" to TokenType("MOD", "operators", Regex("%")),
             "*" to TokenType("MULTIPLY", "operators", Regex("\\*")),
             "||" to TokenType("OR", "BooleanOperators", Regex("\\|\\|")),
             "&&" to TokenType("AND", "BooleanOperators", Regex("&&")),
@@ -49,13 +51,5 @@ val tokensMap : Map<String, TokenType>
             "<" to TokenType("LESS", "BooleanOperators", Regex("<")),
             ">" to TokenType("GREATER", "BooleanOperators", Regex(">")),
             "=" to TokenType("ASSIGN", "AssignOperators", Regex("=")),
-            "stringValue" to TokenType("STRING", "Types", Regex("\"[\\w\\s]*\"")),
-            "number" to TokenType("NUMBER", "Types", Regex("(0|[1-9]\\d*)")),
-            "identifier" to TokenType("IDENT_NAME", "Identifiers", Regex("[A-Za-z_]\\w*")),
-
-
-//            "MULTIPLY" to TokenType("MULTIPLY", "BinaryOperators", Regex("\\*")),
-//            "DIV" to TokenType("DIV", "BinaryOperators", Regex("/")),
-//            "MOD" to TokenType("MOD", "BinaryOperators", Regex("%")),
-
+            "number" to TokenType("NUMBER", "Types", Regex("(0|-?[1-9]\\d*)")),
     )

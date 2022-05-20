@@ -8,7 +8,6 @@ val OPERATORS_PRIORITY = mapOf(
 class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = false) {
     private var pos : Int = 0
     private val scope = mutableMapOf<String, Any>()
-
     private fun match(vararg expected : String) : Token? {
         // return Token if currentToken is one of expected else null
         if (pos >= tokens.size) {
@@ -58,19 +57,11 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
 
     private fun parseVarInitializing() {
         val variableName = require("identifier").text
-        var isArray = false
-        var arrSize = 0
-        if (match("[") != null) {
-            isArray = true
-            arrSize = (parseExpression() as Int)
-            require("]")
-        }
         require(":")
-        val  variableType = require("String", "Int").text
+        require("Int")
         require("=")
         val variableValue = parseExpression()!!
-        scope[variableName] =
-                if (isArray && arrSize > 0) buildList { for (i in 1..arrSize) add(if (variableType == "Int") 0 else "") } else variableValue
+        scope[variableName] = variableValue
     }
 
     private fun parsePrint() {
@@ -87,18 +78,11 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
 
     private fun parseAssignment() {
         val variableName : String = tokens[pos - 1].text
-        var arrIndex : Int? = null
-        if (match("[") != null) {
-            arrIndex = parseExpression() as Int
-            require("]")
-        }
         require("=")
         val variableValue = parseExpression()
         if (scope[variableName] != null) {
-            if (arrIndex != null) {
-                (scope[variableName] as Array<Int>)[arrIndex] = (variableValue as Int)
-            } else scope[variableName] = (variableValue as Int)
-        } else throw Error("Variable $variableName is not declared!")
+            scope[variableName] = variableValue as Int
+        } else throw Exception("Variable $variableName is not declared!")
     }
 
     private fun parseExpression() : Any? {
@@ -140,7 +124,6 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
                 }
                 numberStack.push(scope[currentToken.text] as Int)
             }
-
             currentToken = require("number", "identifier", "[", "]", "(", ")", ";", *OPERATORS, "{")
         }
         while (!operatorsStack.isEmpty()) {
@@ -149,6 +132,8 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
         }
         return numberStack.pop()
     }
+
+
 
     private fun calculateExpression(number1 : Int, number2 : Int, operator : String) : Int {
         when (operator) {
@@ -163,6 +148,9 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
             }
             "/" -> {
                 return number2 / number1
+            }
+            "%" -> {
+                return number2 % number1
             }
             "!=" -> {
                 return if (number2 != number1) 1 else 0
@@ -212,6 +200,7 @@ class Parser(private val tokens : List<Token>, private val DEBUG : Boolean = fal
             }
             pos = startConditionPos
             isTrue = parseExpression() as Int != 0
+
             if (DEBUG) println("Loop condition = $isTrue")
         }
         skipBlock()
